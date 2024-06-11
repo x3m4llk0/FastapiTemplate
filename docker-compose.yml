@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  db-servicename:
+    image: postgres:15
+    container_name: servicename-db
+    volumes:
+      - servicename-postgresdata:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - 5434:5432
+
+
+  servicename:
+    image: regit.othercode.ru/othercode/servicename:latest
+    build:
+      context: .
+    container_name: servicename-app
+    env_file:
+      - .env
+    depends_on:
+      - db-servicename
+    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    ports:
+      - 8000:8000
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6378:REDIS_HOST: str
+                  REDIS_PORT: str"
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27018:27017"
+
+volumes:
+  servicename-postgresdata:
+
