@@ -24,7 +24,8 @@ services:
       - .env
     depends_on:
       - db-servicename
-    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+#    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    command: "uvicorn --factory app.main:app --reload --host 0.0.0.0 --port 8000"
     ports:
       - 8000:8000
 
@@ -32,8 +33,7 @@ services:
     image: redis:latest
     container_name: redis
     ports:
-      - "6378:REDIS_HOST: str
-                  REDIS_PORT: str"
+      - "6378:6378"
 
   mongo:
     image: mongo:latest
