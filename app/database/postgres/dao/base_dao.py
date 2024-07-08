@@ -1,12 +1,12 @@
 from typing import List, Optional, Union, Type, Dict
 
 from sqlalchemy import delete, insert, select, update, inspect
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, InterfaceError
 from sqlalchemy.orm import Session
 
 from app.core.logger import logger
 
-from app.database.postgres.database import async_session_maker, Base
+from app.db.database import async_session_maker, Base
 
 
 class BaseDAO:
@@ -178,9 +178,19 @@ class BaseDAO:
         """
         try:
             return await transaction_func(session, *args, **kwargs)
+        except InterfaceError as e:
+            # Пересоздаем сессию и пробуем снова
+            async with async_session_maker() as new_session:
+                try:
+                    return await transaction_func(new_session, *args, **kwargs)
+                except Exception as e:
+                    cls._log_error(e, operation)
+                    return None
         except Exception as e:
             cls._log_error(e, operation)
             return None
+        finally:
+            await session.close()
 
     @classmethod
     def _log_error(cls, e: Exception, operation: str) -> None:
