@@ -1,6 +1,6 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from app.api.v1.test_routers import router as test_router
+from api.v1.test_routers import router as test_router
 
 # from apscheduler.schedulers.asyncio import AsyncIOScheduler
 

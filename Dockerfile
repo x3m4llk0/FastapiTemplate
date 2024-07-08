@@ -1,10 +1,9 @@
 FROM python:3.12
 
-RUN mkdir /servicename
-
-WORKDIR /servicename
+WORKDIR /app
 
 COPY requirements.txt .
+RUN pip install --upgrade pip
 
 RUN pip install -r requirements.txt
 
