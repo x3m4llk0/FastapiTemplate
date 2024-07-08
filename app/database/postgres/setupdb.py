@@ -5,7 +5,6 @@ import json
 from datetime import datetime
 import uuid
 import random
-from sqlalchemy import insert, text
 
 from app.core.logger import logger
 from app.database.postgres.database import Base, async_session_maker, engine
@@ -34,18 +33,20 @@ async def create_database():
 
 
 async def prepare_database():
-    def open_mock_json(model: str):
-        with open(f"app/tests/mocks/mock_{model}.json", encoding="utf-8") as file:
-            return json.load(file)
-
-    models = open_mock_json("models")
-    async with async_session_maker() as session:
-        for Model, values in [
-            (Models, models)
-        ]:
-            query = insert(Model).values(values)
-            await session.execute(query)
-        await session.commit()
+    pass
+    # необходимо самостоятельно описать свою логику по аналогии с :
+    # def open_mock_json(model: str):
+    #     with open(f"app/tests/mocks/mock_{model}.json", encoding="utf-8") as file:
+    #         return json.load(file)
+    #
+    # models = open_mock_json("models")
+    # async with async_session_maker() as session:
+    #     for Model, values in [
+    #         (Models, models)
+    #     ]:
+    #         query = insert(Model).values(values)
+    #         await session.execute(query)
+    #     await session.commit()
 
 
 async def setup_database():
