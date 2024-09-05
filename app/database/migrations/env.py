@@ -10,25 +10,17 @@ from alembic import context
 sys.path.insert(0, dirname(dirname(dirname(abspath(__file__)))))
 
 from app.core.config import settings
-from app.database.database import Base
+from app.database.postgres import Base
 
 # Без этих импортов не сработает миграция
-from app.models.dating import Dating  # noqa
-from app.models.genders import Gender  # noqa
-from app.models.intentions import Intention  # noqa
-from app.models.interests import Interest  # noqa
-from app.models.locations import Location  # noqa
-from app.models.medias import Media  # noqa
-from app.models.preferences import Preference  # noqa
-from app.models.profile_medias import ProfileMedia  # noqa
-from app.models.statuses import Status  # noqa
-from app.models.users import User  # noqa
+from app.models.tests import TestModel  # noqa
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", f"{settings.DATABASE_URL}?async_fallback=True")
+config.set_main_option("sqlalchemy.url", f"{settings.POSTGRES_URL}?async_fallback=True")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

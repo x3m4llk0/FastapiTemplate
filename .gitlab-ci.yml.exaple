@@ -13,5 +13,6 @@ build:
   image: docker:latest
   stage: build
   script:
-    - docker-compose build db-servicename
-    - docker-compose push db-servicename
+    - docker-compose build <service-name>
+    - docker-compose push <service-name>
+

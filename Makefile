@@ -3,12 +3,14 @@ EXEC = docker exec -it
 LOGS = docker logs
 ENV = --env-file .env
 APP_FILE = docker-compose.yml
-APP_CONTAINER = servicename-app
-SETUPDB = app/database/postgres/setupdb.py
+SERVICE = templateservice
+APP_CONTAINER = $(SERVICE)-app
+COMPOSE_FILES = docker-compose.yml
+
 
 .PHONY: app
 app:
-	${DC} -f ${APP_FILE} ${ENV} up --build -d
+	${DC} -f ${APP_FILE} -f ${COMPOSE_FILES} ${ENV} up --build -d
 
 .PHONY: app-down
 app-down:
@@ -26,22 +28,11 @@ app-logs:
 test:
 	${EXEC} ${APP_CONTAINER} pytest
 
-.PHONY: db-drop
-db-drop:
-	${EXEC} ${APP_CONTAINER} python ${SETUPDB} drop
+.PHONY: migrations
+migrations:
+	alembic revision --autogenerate -m "Added required tables"
 
-.PHONY: db-create
-db-create:
-	${EXEC} ${APP_CONTAINER} python ${SETUPDB} create
+.PHONY: migrate
+migrate:
+	alembic upgrade head
 
-.PHONY: db-prepare
-db-prepare:
-	${EXEC} ${APP_CONTAINER} python ${SETUPDB} prepare
-
-.PHONY: db-setup
-db-setup:
-	${EXEC} ${APP_CONTAINER} python ${SETUPDB} setup
-
-.PHONY: db-alembic
-db-alembic:
-	${EXEC} ${APP_CONTAINER} python ${SETUPDB} alembic

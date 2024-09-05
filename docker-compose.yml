@@ -1,48 +1,53 @@
-version: "3.8"
 services:
-  db-servicename:
+  postgres:
     image: postgres:15
-    container_name: servicename-db
+    container_name: postgres-db
     volumes:
-      - servicename-postgresdata:/var/lib/postgresql/data
-    env_file:
-      - .env
+      - postgres-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=${DB_PASS}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_DB=${DB_NAME}
+      POSTGRES_PASSWORD: ${PG_PASS}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_DB: ${PG_NAME}
     ports:
       - 5434:5432
 
-
-  servicename:
-    image: regit.othercode.ru/othercode/servicename:latest
+  templateservice:
     build:
       context: .
-    container_name: servicename-app
-    env_file:
-      - .env
-    depends_on:
-      - db-servicename
-#    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
-    command: "uvicorn --factory app.main:main_app --reload --host 0.0.0.0 --port 8000"
+    container_name: templateservice-app
     volumes:
-      - .:/app
+      - .:/templateservice
+    environment:
+      # переопределяем локальные переменные из .env для работы в докере
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: ${PG_USER}
+      PG_PASS: ${PG_PASS}
+      PG_NAME: ${PG_NAME}
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+    #    command: sh -c "alembic upgrade head && gunicorn app.main:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
     ports:
       - 8000:8000
 
-#  redis:
-#    image: redis:latest
-#    container_name: redis
-#    ports:
-#      - "6378:6378"
-#
-#  mongo:
-#    image: mongo:latest
-#    container_name: mongo
-#    ports:
-#      - "27018:27017"
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
 
 volumes:
-  servicename-postgresdata:
-
+  postgres-data:

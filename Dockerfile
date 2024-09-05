@@ -1,6 +1,8 @@
 FROM python:3.12
 
-WORKDIR /app
+RUN mkdir /templateservice
+
+WORKDIR /templateservice
 
 COPY requirements.txt .
 RUN pip install --upgrade pip

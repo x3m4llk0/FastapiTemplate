@@ -1,53 +1,45 @@
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from api.v1.test_routers import router as test_router
+from fastapi.middleware.cors import CORSMiddleware
 
-# from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from app.api.v1.test_routers import router as test_router
+from app.core.logger import logger
+from app.middlewares.log_requests import LogRequestsMiddleware
 
-def main_app():
-    app = FastAPI(
-        title='Simple Project',
-        docs_url='/api/docs',
-        description='A simple project template',
-        debug=True
-    )
+app = FastAPI(
+    title='FastAPI Template',
+    description='FastAPI Template for OtherCode',
+    debug=True
+)
 
-    origins = [
-        "*"
-    ]
+origins = [
+    "*"
+]
 
-    app.include_router(test_router)
+# Подключение роутера
+app.include_router(test_router)
 
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
-        allow_headers=[
-            "Content-Type",
-            "Set-Cookie",
-            "Access-Control-Allow-Headers",
-            "Access-Control-Allow-Origin",
-            "Authorization",
-        ],
-    )
+# Добавление CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
+    allow_headers=[
+        "Content-Type",
+        "Set-Cookie",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Origin",
+        "Authorization",
+    ],
+)
 
-    return app
-# scheduler = AsyncIOScheduler()
+# Добавление вашего кастомного Middleware
+# app.add_middleware(LogRequestsMiddleware)
 
+@app.on_event("startup")
+async def startup_event():
+    pass
 
-
-# Подключение CORS, чтобы запросы к API могли приходить из браузера
-
-
-#
-# @app.on_event("startup")
-# async def startup_event():
-#     scheduler.add_job(check_dating_tasks, "interval", hours=12)
-#     # scheduler.add_job(check_dating_tasks, "cron", hour=2, minute=0)
-#     scheduler.start()
-#
-#
-# @app.on_event("shutdown")
-# async def shutdown_event():
-#     scheduler.shutdown()
+@app.on_event("shutdown")
+async def shutdown_event():
+    pass

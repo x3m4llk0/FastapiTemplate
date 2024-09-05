@@ -1,2 +1,15 @@
+aiohttp
+alembic
+asyncpg
 fastapi
+flake8
+motor
+greenlet
 pydantic
+pydantic-settings
+pytest
+python-json-logger
+python-multipart
+redis
+SQLAlchemy
+uvicorn
